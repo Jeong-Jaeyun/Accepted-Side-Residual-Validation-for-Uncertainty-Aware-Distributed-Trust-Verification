@@ -1,0 +1,12 @@
+project:
+  port: "antwerp"
+  raw_path: "data/raw/Antwerp_anonymized.csv"
+  processed_dir: "data/processed/antwerp"
+  artifacts_dir: "artifacts/antwerp"
+  results_dir: "results/antwerp"
+
+time:
+  timezone: "Europe/Brussels"
+
+port_filter:
+  bbox_override: [2.467869, 51.171592, 4.507587, 51.869875]

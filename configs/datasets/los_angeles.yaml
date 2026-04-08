@@ -1,0 +1,12 @@
+project:
+  port: "los_angeles"
+  raw_path: "data/raw/Los Angeles_anonymized.csv"
+  processed_dir: "data/processed/los_angeles"
+  artifacts_dir: "artifacts/los_angeles"
+  results_dir: "results/los_angeles"
+
+time:
+  timezone: "America/Los_Angeles"
+
+port_filter:
+  bbox_override: [-118.279553, 33.640635, -118.115664, 33.7758]

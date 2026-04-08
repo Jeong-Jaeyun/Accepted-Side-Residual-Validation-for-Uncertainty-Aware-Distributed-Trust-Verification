@@ -1,0 +1,14 @@
+verification:
+  implementation: "s3_mev"
+  pipeline_mode: "s3_qbm_strongq"
+  qbm_calibration_mode: "benign_only"
+  qbm_threshold_stage: "accepted_only"
+  qbm_threshold_quantile: 0.01
+  qbm_use_saved_calibration: true
+  qbm_save_calibration: true
+
+qbm:
+  qbm_feature_set_version: "residual_v2"
+  qbm_calibration_version: "benign_only_v1"
+  qiskit_backend_mode: "exact_state"
+  shots: 1024

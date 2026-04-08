@@ -1,0 +1,9 @@
+verification:
+  implementation: "s3_mev"
+  pipeline_mode: "s3_qbm"
+  qbm_calibration_mode: "benign_only"
+
+qbm:
+  qbm_feature_set_version: "residual_v2"
+  qbm_calibration_version: "benign_only_v1"
+  qiskit_backend_mode: "ibm_backend"

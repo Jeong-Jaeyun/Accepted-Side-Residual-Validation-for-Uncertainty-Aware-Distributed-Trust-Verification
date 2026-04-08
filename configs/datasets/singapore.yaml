@@ -1,0 +1,12 @@
+project:
+  port: "singapore"
+  raw_path: "data/raw/Singapore_anonymized.csv"
+  processed_dir: "data/processed/singapore"
+  artifacts_dir: "artifacts/singapore"
+  results_dir: "results/singapore"
+
+time:
+  timezone: "Asia/Singapore"
+
+port_filter:
+  bbox_override: [103.384752, 1.037212, 104.773262, 1.984194]

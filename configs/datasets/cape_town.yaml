@@ -1,0 +1,12 @@
+project:
+  port: "cape_town"
+  raw_path: "data/raw/cape town_anonymized.csv"
+  processed_dir: "data/processed/cape_town"
+  artifacts_dir: "artifacts/cape_town"
+  results_dir: "results/cape_town"
+
+time:
+  timezone: "Africa/Johannesburg"
+
+port_filter:
+  bbox_override: [18.072277, -34.012718, 18.465457, -33.638051]

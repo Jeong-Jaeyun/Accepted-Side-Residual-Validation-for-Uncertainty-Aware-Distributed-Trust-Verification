@@ -1,0 +1,105 @@
+project:
+  seed: 42
+  port: busan
+  raw_path: data/raw/Busan_anonymized.csv
+  processed_dir: data\processed\busan\s2_jump_30km
+  artifacts_dir: artifacts\s2_jump_30km
+  results_dir: results\s2_jump_30km
+schema_mapping:
+  ts: timestamp
+  mmsi: MMSI
+  lat: Latitude
+  lon: Longitude
+  sog: speed
+  cog: Cog
+  heading: TrueHeading
+  nav_status: NavigationalStatus
+time:
+  timezone: Asia/Seoul
+  dt_minutes: 5
+  t0: null
+port_filter:
+  use_polygon: false
+  bbox_override: null
+grid:
+  nx: 10
+  ny: 10
+features:
+  lookback_K: 12
+  vmax_knots: 60.0
+  eps: 1.0e-09
+  burst_baseline_windows: 60
+  cog_jump_deg: 90.0
+  sog_high_knots: 10.0
+  sog_jump_knots_per_min: 20.0
+discretization:
+  fit_on: clean
+  normal_range:
+    start_ts: null
+    end_ts: null
+  q_low: 0.33
+  q_high: 0.66
+encoding:
+  feature_order:
+  - F1_unique_mmsi_count
+  - F2_new_mmsi_rate
+  - F3_message_burstiness
+  - F4_position_jump_rate
+  - F5_speed_heading_inconsistency
+  - F6_spatial_density_entropy
+qbm:
+  backend: aer
+  shots: 2048
+  epochs: 20
+  lr: 0.05
+  batch_windows: 128
+  n_visible: 18
+  n_hidden: 6
+  n_layers: 2
+  train_on: clean
+  train_fraction: 0.7
+policy:
+  table_path: policy/policy_table.yaml
+  enable_duration: true
+blockchain_net:
+  validators: 7
+  gateways: 4
+  edges: 200
+  base_delay_ms: 50
+  base_loss_rate: 0.01
+  action_effects:
+    traffic_throttling:
+      tx_rate_multiplier: 0.5
+      mempool_admission: tight
+      gossip_fanout_multiplier: 0.8
+    peer_repeering:
+      rewire_fraction: 0.2
+      gossip_fanout_multiplier: 1.0
+    isolate_suspicious_mmsi_group:
+      drop_ratio: 0.3
+      mempool_admission: quarantine
+    identity_revalidation:
+      pq_verify_strict: true
+    broadcast_alert:
+      base_delay_ms_multiplier: 1.1
+      block_size_multiplier: 0.8
+experiments:
+  enable_injection: true
+  scenario: S2
+  injection_window:
+    start_window: 500
+    end_window: 800
+  S1:
+    intensity: 0.3
+    target_zone: hotspot
+    message_multiplier: 1.5
+  S2:
+    intensity: 0.2
+    jump_distance_km: 30.0
+    affect_existing_fraction: 0.1
+  S3:
+    intensity: 0.25
+    message_multiplier: 2.0
+    jump_distance_km: 30.0
+    affect_existing_fraction: 0.1
+    target_zone: hotspot

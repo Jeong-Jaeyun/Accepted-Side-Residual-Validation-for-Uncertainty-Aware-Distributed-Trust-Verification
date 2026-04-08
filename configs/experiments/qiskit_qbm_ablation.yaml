@@ -1,0 +1,11 @@
+verification:
+  implementation: "s3_mev"
+  pipeline_mode: "s3_qbm"
+  qbm_calibration_mode: "contrastive"
+  qbm_contrastive_attack_ids: ["A4P", "A5"]
+  qbm_threshold_stage: "accepted_only"
+
+qbm:
+  qbm_feature_set_version: "residual_v2"
+  qbm_calibration_version: "contrastive_v1"
+  qiskit_backend_mode: "exact_state"

@@ -1,0 +1,22 @@
+# Large datasets and results
+data/raw/*
+data/processed/*
+results/
+artifacts/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.venv/
+venv/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db

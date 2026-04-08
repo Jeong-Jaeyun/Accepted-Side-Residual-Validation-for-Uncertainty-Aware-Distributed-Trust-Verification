@@ -1,0 +1,326 @@
+project:
+  seed: 42
+  port: "busan"
+  raw_path: "data/raw/Busan_anonymized.csv"
+  processed_dir: "data/processed/busan"
+  artifacts_dir: "artifacts"
+  results_dir: "results"
+
+schema_mapping:
+  ts: "timestamp"
+  mmsi: "MMSI"
+  lat: "Latitude"
+  lon: "Longitude"
+  sog: "speed"
+  cog: "Cog"
+  heading: "TrueHeading"
+  nav_status: "NavigationalStatus"
+
+time:
+  timezone: "Asia/Seoul"  # Busan 데이터는 KST
+  dt_minutes: 5
+  t0: null               # null이면 자동(최소 ts)
+
+port_filter:
+  use_polygon: false     # polygon 있으면 true로
+  bbox_override: null    # null이면 ports.yaml 사용, 아니면 [min_lon,min_lat,max_lon,max_lat]
+
+grid:
+  nx: 10
+  ny: 10
+
+features:
+  lookback_K: 12         # new_MMSI_rate 계산에 사용(Δt=5분이면 1시간)
+  vmax_knots: 60.0       # position jump 판정 임계
+  eps: 1.0e-9
+
+  # F3 burstiness baseline
+  burst_baseline_windows: 60   # moving avg(윈도우 수); 60이면 5시간(Δt=5m)
+
+  # F5 inconsistency thresholds (초기값, 이후 튜닝 가능)
+  cog_jump_deg: 90.0
+  sog_high_knots: 10.0
+  sog_jump_knots_per_min: 20.0
+
+discretization:
+  # 정상 구간 정의: 주입 전 원본 기준이면 fit_on="clean"
+  fit_on: "clean"        # clean | explicit_range
+  normal_range:
+    start_ts: null       # "2024-01-01T00:00:00Z" 같은 형태
+    end_ts: null
+
+  q_low: 0.33
+  q_high: 0.66
+
+encoding:
+  # feature 순서는 고정 (논문/코드 일관성)
+  feature_order:
+    - "F1_unique_mmsi_count"
+    - "F2_new_mmsi_rate"
+    - "F3_message_burstiness"
+    - "F4_position_jump_rate"
+    - "F5_speed_heading_inconsistency"
+    - "F6_spatial_density_entropy"
+
+qbm:
+  # MVP에서는 작게 시작 (회로 깊이/파라미터 적게)
+  backend: "aer"
+  shots: 2048
+  epochs: 20
+  lr: 0.05
+  batch_windows: 128
+  qbm_feature_set_version: "residual_v2"
+  qbm_calibration_version: "benign_only_v1"
+  qiskit_backend_mode: "exact_state"  # exact_state | aer_shot | ibm_backend
+  qiskit_layers: 2
+  qiskit_num_hidden: 2
+  qiskit_seed: 42
+  qiskit_input_phase_scale: 0.28
+  qiskit_hidden_biases: [0.54, 0.66]
+  qiskit_hidden_mixers: [0.10, 0.14]
+  qiskit_entangle_scale: 0.18
+  qiskit_noise_1q: 0.0015
+  qiskit_noise_2q: 0.0080
+  qiskit_readout_error: 0.0100
+  qiskit_transpile_optimization_level: 1
+  qiskit_feature_keys:
+    - "r_trust_sim_gap"
+    - "r_overlap_spread"
+    - "r_context_dev"
+    - "r_policy_gray_contra"
+    - "r_trust_sim_prod"
+    - "r_benign_delta"
+    - "r_temporal_inconsistency"
+    - "r_witness_disagree"
+  qiskit_visible_weights: [0.92, 0.84, 0.88, 0.90, 0.56, 0.86, 0.82, 0.88]
+  qiskit_hidden_weights: [0.18, 0.22]
+  qiskit_hidden_couplings:
+    - [0.34, 0.30, 0.12, 0.08, 0.28, 0.14, 0.16, 0.26]
+    - [0.10, 0.10, 0.32, 0.36, 0.10, 0.20, 0.28, 0.16]
+  qiskit_visible_hidden_weights:
+    - [0.18, 0.16, 0.10, 0.08, 0.14, 0.10, 0.10, 0.16]
+    - [0.08, 0.08, 0.16, 0.20, 0.08, 0.12, 0.16, 0.10]
+  qiskit_hidden_hidden_weight: 0.12
+  qiskit_visible_pair_couplings:
+    - [0, 1, 0.18]
+    - [0, 4, 0.14]
+    - [2, 3, 0.18]
+    - [2, 5, 0.20]
+    - [6, 7, 0.20]
+    - [3, 6, 0.16]
+  qiskit_visible_pair_weights:
+    - [0, 1, 0.10]
+    - [0, 4, 0.08]
+    - [2, 3, 0.12]
+    - [2, 5, 0.12]
+    - [6, 7, 0.14]
+    - [3, 6, 0.10]
+  qiskit_expected_context_weights:
+    bias: 0.08
+    trust_mean: 0.34
+    sim: 0.34
+    pair_overlap_mean: 0.16
+    policy_safe: 0.08
+  qiskit_benign_reference:
+    trust_mean: 0.92
+    sim: 0.92
+    context_ratio: 0.98
+    pair_overlap_mean: 0.92
+    pair_overlap_min: 0.86
+    policy_safe: 0.98
+  qiskit_score_scale: 1.28
+  qiskit_score_offset: 0.82
+  qiskit_shot_penalty: 0.22
+  qiskit_precision: 0.0
+
+  # 모델 규모(일단 작게)
+  n_visible: 18
+  n_hidden: 6
+  n_layers: 2
+
+  # 학습에 사용할 정상 윈도우 비율(또는 기간)
+  train_on: "clean"
+  train_fraction: 0.7
+
+policy:
+  table_path: "policy/policy_table.yaml"
+  # duration은 정책 엔진이 rolling으로 계산
+  enable_duration: true
+
+blockchain_net:
+  # raft-only v1
+  validators: 7
+  gateways: 4
+  edges: 200
+
+  # 네트워크 지연 모델(단순 분포 파라미터)
+  base_delay_ms: 50
+  base_loss_rate: 0.01
+
+  # action -> parameter effect (정책 실행 시 적용)
+  action_effects:
+    traffic_throttling:
+      tx_rate_multiplier: 0.5
+      mempool_admission: "tight"
+      gossip_fanout_multiplier: 0.8
+    peer_repeering:
+      rewire_fraction: 0.2
+      gossip_fanout_multiplier: 1.0
+    isolate_suspicious_mmsi_group:
+      drop_ratio: 0.3
+      mempool_admission: "quarantine"
+    identity_revalidation:
+      pq_verify_strict: true
+    broadcast_alert:
+      base_delay_ms_multiplier: 1.1
+      block_size_multiplier: 0.8
+
+experiments:
+  enable_injection: true
+  scenario: "S3"     # S1 | S2 | S3
+  attack_id: ""      # A0..A5|A4P, empty => auto by scenario
+  rho: 0.2
+  capture_k: 2
+  partition_loss_boost: 0.12
+
+  injection_window:
+    start_window: 500
+    end_window: 800
+
+  S1:
+    intensity: 0.3          # 신규 MMSI 주입 비율(윈도우 내 기존 MMSI 대비)
+    target_zone: "hotspot"  # hotspot | random
+    message_multiplier: 1.5
+
+  S2:
+    intensity: 0.2
+    jump_distance_km: 80.0
+    affect_existing_fraction: 0.1
+
+  S3:
+    intensity: 0.25
+    message_multiplier: 2.0
+    jump_distance_km: 30.0
+    affect_existing_fraction: 0.1
+    target_zone: "hotspot"
+
+  A4:
+    # A4 = time-shifted replay (no partial perturbation)
+    time_jitter_slots: 1
+    recent_windows: 120
+
+  A4P:
+    # A4P = near-replay (partial top-k/context/score perturbation)
+    level: 3
+    p_topk_mutate: 0.20
+    ctx_drift_strength: 0.08
+    conf_jitter: 0.04
+    time_jitter_slots: 1
+    recent_windows: 120
+
+verification:
+  implementation: null   # none | s2_strict | s3_mev | qbm | strongq
+  pipeline_mode: "auto"  # auto | s3_only | s3_qbm | s3_strongq | s3_qbm_strongq
+  quorum: 0.6666666667
+  confidence_floor: 0.70
+  variance_tol: 1.0e-8
+  corr_threshold: 0.78
+  explanation_threshold: 0.50
+  context_consistency_floor: 0.67
+  soft_weights:
+    corr: 0.35
+    sim: 0.25
+    context_ratio: 0.25
+    trust_mean: 0.15
+  s3_soft_tau: 0.72
+  s3_soft_gray_margin: 0.05
+  s3_grayzone_use_strongq: false
+  # Trainer-layer (qbm/train.py) tau pre-calibration controls.
+  s3_auto_tau_from_a0: true
+  s3_tau_freeze_after_calibration: true
+  s3_tau_calibration_windows: 300
+  s3_tau_quantile: 0.95
+  s3_tau_min_samples: 20
+  # Trainer-layer (qbm/train.py) gray-margin auto-calibration controls.
+  s3_auto_gray_margin_from_a0: true
+  s3_target_gray_rate_a0: 0.03
+  s3_gray_margin_min: 0.001
+  s3_gray_margin_max: 0.05
+  s3_grayzone_requires_policy_hint: false
+  s3_grayzone_no_policy_action: "mev"
+  s3_strongq_mode: "veto"
+  # StrongQ call gate (gray-zone AND this risk OR-condition):
+  # policy_fired_ratio > p0 OR context_ratio < c0 OR sim < s0 OR |soft_score-tau| < band
+  s3_risk_policy_ratio_floor: 0.10   # p0
+  s3_risk_context_floor: 0.92        # c0
+  s3_risk_explanation_floor: 0.90    # s0
+  s3_risk_tau_band: 0.00012          # narrow band around tau
+  # Trainer-layer (qbm/train.py) StrongQ threshold pre-calibration controls.
+  s3_auto_strongq_threshold: true
+  s3_strongq_threshold_quantile: 0.50
+  s3_strongq_threshold_min_samples: 12
+  qbm_threshold: 0.55
+  qbm_auto_threshold_from_a0: true
+  qbm_threshold_quantile: 0.05
+  qbm_threshold_min_samples: 20
+  qbm_threshold_calibration_windows: 300
+  qbm_threshold_stage: "accepted_only"
+  qbm_calibration_mode: "benign_only"   # benign_only | contrastive
+  qbm_contrastive_attack_ids: []
+  qbm_use_saved_calibration: true
+  qbm_save_calibration: true
+  qbm_calibration_artifact: null
+  strongq_witness_threshold: 0.58
+  strongq_ci_gate: false
+  strongq_ci_z_score: 1.96
+  strict_window_sequence: false
+  explanation_feature_whitelist:
+    - "F1_unique_mmsi_count"
+    - "F2_new_mmsi_rate"
+    - "F3_message_burstiness"
+    - "F4_position_jump_rate"
+    - "F5_speed_heading_inconsistency"
+    - "F6_spatial_density_entropy"
+  s2_expected_topk_len: 3
+  s2_enforce_explanation_schema: false
+  trust_weights:
+    score: 0.45
+    confidence: 0.40
+    explanation: 0.15
+
+simulation:
+  base_capacity_tps: 180.0
+  max_backlog: 350000.0
+  partition_loss_extra: 0.06
+  tcp_backlog_threshold: 250000.0
+  tcp_drop_ratio_threshold: 0.80
+  overhead_mult:
+    none: 1.00
+    s2_strict: 1.03
+    s3_mev: 1.04
+    s3_only: 1.04
+    s3_strongq: 1.04
+    qbm_verifier: 1.06
+    s3_qbm: 1.06
+    s3_qbm_strongq: 1.06
+    strongq_verifier: 1.08
+
+evaluation:
+  # Window-level classifier metrics use verifier-visible malicious windows by default.
+  label_source: "malicious_visible"   # malicious_visible | malicious_injected
+  prediction_source: "reject"         # reject | policy_fired | score
+  score_threshold: 0.50
+  cost_weights:
+    false_positive: 1.0
+    false_negative: 5.0
+
+benchmark:
+  scenarios: ["S0", "S1", "S2", "S3"]
+  attacks: ["A0", "A1", "A2", "A3", "A4", "A5"]  # Use A4P explicitly when near-replay is needed.
+  default_verifier:
+    S0: "none"
+    S1: "none"
+    S2: "s2_strict"
+    S3: "s3_mev"
+  s3_verifier_ablation: ["s3_mev", "qbm", "strongq"]
+

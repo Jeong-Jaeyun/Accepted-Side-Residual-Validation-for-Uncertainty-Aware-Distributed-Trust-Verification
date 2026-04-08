@@ -1,0 +1,13 @@
+# Core runtime deps
+numpy>=1.20
+pandas>=1.5
+PyYAML>=6.0
+
+# Plotting (optional unless running scripts that generate figures)
+matplotlib>=3.5
+
+# Parquet IO (optional but recommended; qbm.train can fall back to CSV)
+pyarrow>=10.0
+
+# Optional quantum backend for shallow QBM feasibility experiments
+qiskit>=1.2

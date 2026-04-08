@@ -1,0 +1,146 @@
+project:
+  seed: 42
+  port: "busan"
+  raw_path: "data/raw/Busan_anonymized.csv"
+  processed_dir: "data/processed/busan/s0"
+  artifacts_dir: "artifacts"
+  results_dir: "results"
+
+schema_mapping:
+  ts: "timestamp"
+  mmsi: "MMSI"
+  lat: "Latitude"
+  lon: "Longitude"
+  sog: "speed"
+  cog: "Cog"
+  heading: "TrueHeading"
+  nav_status: "NavigationalStatus"
+
+time:
+  timezone: "Asia/Seoul"  # Busan 데이터는 KST
+  dt_minutes: 5
+  t0: null               # null이면 자동(최소 ts)
+
+port_filter:
+  use_polygon: false     # polygon 있으면 true로
+  bbox_override: null    # null이면 ports.yaml 사용, 아니면 [min_lon,min_lat,max_lon,max_lat]
+
+grid:
+  nx: 10
+  ny: 10
+
+features:
+  lookback_K: 12         # new_MMSI_rate 계산에 사용(Δt=5분이면 1시간)
+  vmax_knots: 60.0       # position jump 판정 임계
+  eps: 1.0e-9
+
+  # F3 burstiness baseline
+  burst_baseline_windows: 60   # moving avg(윈도우 수); 60이면 5시간(Δt=5m)
+
+  # F5 inconsistency thresholds (초기값, 이후 튜닝 가능)
+  cog_jump_deg: 90.0
+  sog_high_knots: 10.0
+  sog_jump_knots_per_min: 20.0
+
+discretization:
+  # 정상 구간 정의: 주입 전 원본 기준이면 fit_on="clean"
+  fit_on: "clean"        # clean | explicit_range
+  normal_range:
+    start_ts: null       # "2024-01-01T00:00:00Z" 같은 형태
+    end_ts: null
+
+  q_low: 0.33
+  q_high: 0.66
+
+encoding:
+  # feature 순서는 고정 (논문/코드 일관성)
+  feature_order:
+    - "F1_unique_mmsi_count"
+    - "F2_new_mmsi_rate"
+    - "F3_message_burstiness"
+    - "F4_position_jump_rate"
+    - "F5_speed_heading_inconsistency"
+    - "F6_spatial_density_entropy"
+
+qbm:
+  # MVP에서는 작게 시작 (회로 깊이/파라미터 적게)
+  backend: "aer"
+  shots: 2048
+  epochs: 20
+  lr: 0.05
+  batch_windows: 128
+
+  # 모델 규모(일단 작게)
+  n_visible: 18
+  n_hidden: 6
+  n_layers: 2
+
+  # 학습에 사용할 정상 윈도우 비율(또는 기간)
+  train_on: "clean"
+  train_fraction: 0.7
+
+policy:
+  table_path: "policy/policy_table.yaml"
+  # duration은 정책 엔진이 rolling으로 계산
+  enable_duration: true
+
+blockchain_net:
+  # raft-only v1
+  validators: 7
+  gateways: 4
+  edges: 200
+
+  # 네트워크 지연 모델(단순 분포 파라미터)
+  base_delay_ms: 50
+  base_loss_rate: 0.01
+
+  # action -> parameter effect (정책 실행 시 적용)
+  action_effects:
+    traffic_throttling:
+      tx_rate_multiplier: 0.5
+      mempool_admission: "tight"
+      gossip_fanout_multiplier: 0.8
+    peer_repeering:
+      rewire_fraction: 0.2
+      gossip_fanout_multiplier: 1.0
+    isolate_suspicious_mmsi_group:
+      drop_ratio: 0.3
+      mempool_admission: "quarantine"
+    identity_revalidation:
+      pq_verify_strict: true
+    broadcast_alert:
+      base_delay_ms_multiplier: 1.1
+      block_size_multiplier: 0.8
+
+experiments:
+  enable_injection: false
+  scenario: "S0"     # S1 | S2 | S3
+  attack_id: "A0"
+  rho: 0.2
+  capture_k: 2
+  partition_loss_boost: 0.12
+
+  injection_window:
+    start_window: 500
+    end_window: 800
+
+  S1:
+    intensity: 0.3          # 신규 MMSI 주입 비율(윈도우 내 기존 MMSI 대비)
+    target_zone: "hotspot"  # hotspot | random
+    message_multiplier: 1.5
+
+  S2:
+    intensity: 0.2
+    jump_distance_km: 80.0
+    affect_existing_fraction: 0.1
+
+  S3:
+    intensity: 0.25
+    message_multiplier: 2.0
+    jump_distance_km: 30.0
+    affect_existing_fraction: 0.1
+    target_zone: "hotspot"
+
+verification:
+  implementation: "none"
+

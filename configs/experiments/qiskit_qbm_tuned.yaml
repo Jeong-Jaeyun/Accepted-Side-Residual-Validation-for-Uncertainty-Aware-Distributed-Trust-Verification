@@ -1,0 +1,75 @@
+verification:
+  implementation: "qbm"
+  pipeline_mode: "s3_qbm"
+  qbm_threshold: 0.55
+  qbm_auto_threshold_from_a0: true
+  qbm_threshold_quantile: 0.05
+  qbm_threshold_min_samples: 20
+  qbm_threshold_calibration_windows: 300
+  qbm_threshold_stage: "accepted_only"
+  qbm_calibration_mode: "benign_only"
+  qbm_contrastive_attack_ids: []
+  qbm_use_saved_calibration: true
+  qbm_save_calibration: true
+  qbm_calibration_artifact: null
+
+qbm:
+  qbm_feature_set_version: "residual_v2"
+  qbm_calibration_version: "benign_only_v1"
+  qiskit_backend_mode: "exact_state"
+  qiskit_layers: 2
+  qiskit_num_hidden: 2
+  qiskit_noise_1q: 0.0015
+  qiskit_noise_2q: 0.0080
+  qiskit_readout_error: 0.0100
+  qiskit_transpile_optimization_level: 1
+  qiskit_feature_keys:
+    - "r_trust_sim_gap"
+    - "r_overlap_spread"
+    - "r_context_dev"
+    - "r_policy_gray_contra"
+    - "r_trust_sim_prod"
+    - "r_benign_delta"
+    - "r_temporal_inconsistency"
+    - "r_witness_disagree"
+  qiskit_visible_weights: [0.92, 0.84, 0.88, 0.90, 0.56, 0.86, 0.82, 0.88]
+  qiskit_hidden_weights: [0.18, 0.22]
+  qiskit_hidden_biases: [0.54, 0.66]
+  qiskit_hidden_mixers: [0.10, 0.14]
+  qiskit_hidden_couplings:
+    - [0.34, 0.30, 0.12, 0.08, 0.28, 0.14, 0.16, 0.26]
+    - [0.10, 0.10, 0.32, 0.36, 0.10, 0.20, 0.28, 0.16]
+  qiskit_visible_hidden_weights:
+    - [0.18, 0.16, 0.10, 0.08, 0.14, 0.10, 0.10, 0.16]
+    - [0.08, 0.08, 0.16, 0.20, 0.08, 0.12, 0.16, 0.10]
+  qiskit_hidden_hidden_weight: 0.12
+  qiskit_visible_pair_couplings:
+    - [0, 1, 0.18]
+    - [0, 4, 0.14]
+    - [2, 3, 0.18]
+    - [2, 5, 0.20]
+    - [6, 7, 0.20]
+    - [3, 6, 0.16]
+  qiskit_visible_pair_weights:
+    - [0, 1, 0.10]
+    - [0, 4, 0.08]
+    - [2, 3, 0.12]
+    - [2, 5, 0.12]
+    - [6, 7, 0.14]
+    - [3, 6, 0.10]
+  qiskit_expected_context_weights:
+    bias: 0.08
+    trust_mean: 0.34
+    sim: 0.34
+    pair_overlap_mean: 0.16
+    policy_safe: 0.08
+  qiskit_benign_reference:
+    trust_mean: 0.92
+    sim: 0.92
+    context_ratio: 0.98
+    pair_overlap_mean: 0.92
+    pair_overlap_min: 0.86
+    policy_safe: 0.98
+  qiskit_score_scale: 1.28
+  qiskit_score_offset: 0.82
+  qiskit_shot_penalty: 0.22

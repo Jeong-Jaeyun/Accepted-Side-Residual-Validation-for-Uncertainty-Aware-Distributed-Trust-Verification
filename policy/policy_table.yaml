@@ -1,0 +1,58 @@
+meta:
+  source: auto-calibrated from S0
+  s0_dir: data/processed/busan/s0
+  quantiles:
+    F2: 0.995
+    F3: 0.995
+    F4: 0.999
+thresholds:
+  F2_new_mmsi_rate: 1.0
+  F3_message_burstiness: 5.3659510730613915
+  F4_position_jump_rate: 0.0
+rules:
+- id: R_S1_ID_FLOOD
+  if:
+    any:
+    - feature: F2_new_mmsi_rate
+      op: '>'
+      threshold_key: F2_new_mmsi_rate
+    - feature: F3_message_burstiness
+      op: '>'
+      threshold_key: F3_message_burstiness
+  then:
+  - throttle_admission
+  - quarantine_new_mmsi
+  severity: 2
+  explain: S1-like identity/message flood
+- id: R_S2_POS_JUMP
+  if:
+    all:
+    - feature: F4_position_jump_rate
+      op: '>'
+      value: 0.0
+  then:
+  - isolate_suspicious_mmsi
+  - pq_key_rotation_event
+  severity: 3
+  explain: S2-like physically implausible movement
+- id: R_S3_HYBRID
+  if:
+    all:
+    - rule: R_S1_ID_FLOOD
+    - rule: R_S2_POS_JUMP
+  then:
+  - throttle_admission
+  - isolate_suspicious_mmsi
+  - quarantine_new_mmsi
+  severity: 4
+  explain: 'Hybrid: flood + spoofing'
+  priority: 100
+action_effects:
+  throttle_admission:
+    admission_rate_mult: 0.6
+  quarantine_new_mmsi:
+    drop_new_mmsi_mult: 0.8
+  isolate_suspicious_mmsi:
+    drop_suspicious_mult: 0.5
+  pq_key_rotation_event:
+    consensus_overhead_mult: 1.1
