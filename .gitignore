@@ -1,8 +1,9 @@
-# Large datasets and results
+﻿# Large datasets and results
 data/raw/*
 data/processed/*
 results/
-artifacts/
+
+# Keep artifacts/ - small calibration files (<100KB)
 
 # Python cache
 __pycache__/

@@ -1,0 +1,132 @@
+{
+  "version": 1,
+  "mode": "benign_only",
+  "benign_reference": {
+    "trust_mean": 0.5917238363000765,
+    "sim": 1.0,
+    "context_ratio": 1.0,
+    "pair_overlap_mean": 1.0,
+    "pair_overlap_min": 1.0,
+    "policy_safe": 1.0
+  },
+  "expected_context_weights": {
+    "bias": 0.24999999999999986,
+    "trust_mean": -1.6653345369377348e-16,
+    "sim": 0.24999999999999983,
+    "pair_overlap_mean": 0.24999999999999983,
+    "policy_safe": 0.24999999999999983
+  },
+  "visible_weights": [
+    0.516126382375702,
+    1.345672852610439,
+    1.345672852610439,
+    0.3,
+    0.516126382375702,
+    1.345672852610439,
+    1.345672852610439,
+    0.3
+  ],
+  "visible_pair_couplings": [
+    [
+      2,
+      4,
+      0.28
+    ],
+    [
+      0,
+      4,
+      0.28
+    ],
+    [
+      0,
+      2,
+      0.28
+    ],
+    [
+      2,
+      5,
+      0.2780318481474779
+    ],
+    [
+      4,
+      5,
+      0.27803184814747783
+    ],
+    [
+      0,
+      5,
+      0.27803184814747783
+    ]
+  ],
+  "visible_pair_weights": [
+    [
+      2,
+      4,
+      0.19
+    ],
+    [
+      0,
+      4,
+      0.19
+    ],
+    [
+      0,
+      2,
+      0.19
+    ],
+    [
+      2,
+      5,
+      0.18862229370323452
+    ],
+    [
+      4,
+      5,
+      0.18862229370323447
+    ],
+    [
+      0,
+      5,
+      0.18862229370323447
+    ]
+  ],
+  "score_scale": 1.28,
+  "score_offset": -12.771457301460336,
+  "qbm_threshold": 0.8700584459646685,
+  "qbm_threshold_stage": "accepted_only",
+  "qbm_threshold_quantile": 0.01,
+  "shadow_samples": 180,
+  "eligible_samples": 165,
+  "benign_samples": 165,
+  "malicious_samples": 0,
+  "benign_energy_mean": -8.262840086163816,
+  "benign_energy_std": 0.0927993661282688,
+  "malicious_energy_mean": NaN,
+  "malicious_energy_std": 0.0,
+  "benign_q_score_quantile": 0.8700584459646685,
+  "feature_schema_version": "residual_v2",
+  "reference_mode": "global_benign_reference",
+  "expected_context_mode": "benign_only_linear_reference",
+  "feature_keys": [
+    "r_trust_sim_gap",
+    "r_overlap_spread",
+    "r_context_dev",
+    "r_policy_gray_contra",
+    "r_trust_sim_prod",
+    "r_benign_delta",
+    "r_temporal_inconsistency",
+    "r_witness_disagree"
+  ],
+  "artifact_version": 2,
+  "qbm_feature_set_version": "residual_v2",
+  "qbm_calibration_version": "benign_only_v1",
+  "qbm_backend_mode": "aer_shot",
+  "qbm_backend_label": "qiskit_aer_estimator",
+  "qbm_seed": 42,
+  "scenario": "S3",
+  "calibration_window_count": 180,
+  "calibration_attack_ids": [
+    "A0"
+  ],
+  "config_hash": "b5329ce33c5b17117426bde9309c430efe86766e76572e45ef0664563fbc4f49"
+}

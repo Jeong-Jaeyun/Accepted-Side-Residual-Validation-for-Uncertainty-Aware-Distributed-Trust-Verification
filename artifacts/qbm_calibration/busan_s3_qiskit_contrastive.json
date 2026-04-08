@@ -1,0 +1,110 @@
+{
+  "version": 1,
+  "mode": "contrastive",
+  "benign_reference": {
+    "trust_mean": 0.5914278095784975,
+    "sim": 1.0,
+    "context_ratio": 1.0,
+    "pair_overlap_mean": 1.0,
+    "pair_overlap_min": 1.0,
+    "policy_safe": 1.0
+  },
+  "expected_context_weights": {
+    "bias": 0.25000000000000006,
+    "trust_mean": 0.0,
+    "sim": 0.25,
+    "pair_overlap_mean": 0.25,
+    "policy_safe": 0.25
+  },
+  "visible_weights": [
+    0.5819405315798831,
+    1.0533955111679927,
+    1.0533955111679927,
+    1.0533955111679927,
+    0.5819405315798831,
+    1.0533955111679927,
+    1.0533955111679927,
+    0.3
+  ],
+  "visible_pair_couplings": [
+    [
+      4,
+      5,
+      0.28
+    ],
+    [
+      2,
+      5,
+      0.28
+    ],
+    [
+      2,
+      4,
+      0.28
+    ],
+    [
+      0,
+      5,
+      0.28
+    ],
+    [
+      0,
+      4,
+      0.28
+    ],
+    [
+      0,
+      2,
+      0.28
+    ]
+  ],
+  "visible_pair_weights": [
+    [
+      4,
+      5,
+      0.19
+    ],
+    [
+      2,
+      5,
+      0.19
+    ],
+    [
+      2,
+      4,
+      0.19
+    ],
+    [
+      0,
+      5,
+      0.19
+    ],
+    [
+      0,
+      4,
+      0.19
+    ],
+    [
+      0,
+      2,
+      0.19
+    ]
+  ],
+  "score_scale": 1.28,
+  "score_offset": -14.381051806336195,
+  "qbm_threshold": 0.8735415092296547,
+  "qbm_threshold_stage": "accepted_only",
+  "qbm_threshold_quantile": 0.05,
+  "benign_samples": 80,
+  "malicious_samples": 0,
+  "feature_keys": [
+    "r_trust_sim_gap",
+    "r_overlap_spread",
+    "r_context_dev",
+    "r_policy_gray_contra",
+    "r_trust_sim_prod",
+    "r_benign_delta",
+    "r_temporal_inconsistency",
+    "r_witness_disagree"
+  ]
+}

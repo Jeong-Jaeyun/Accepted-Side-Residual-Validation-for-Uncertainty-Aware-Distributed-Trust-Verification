@@ -1,0 +1,26 @@
+{
+  "F1_unique_mmsi_count": {
+    "low": 4.0,
+    "high": 14.0
+  },
+  "F2_new_mmsi_rate": {
+    "low": 0.0,
+    "high": 0.0
+  },
+  "F3_message_burstiness": {
+    "low": 0.39064630772652326,
+    "high": 1.2489757526875103
+  },
+  "F4_position_jump_rate": {
+    "low": 0.0,
+    "high": 0.0
+  },
+  "F5_speed_heading_inconsistency": {
+    "low": 0.0,
+    "high": 0.0
+  },
+  "F6_spatial_density_entropy": {
+    "low": 1.3321790362101222,
+    "high": 2.3046193738206715
+  }
+}
