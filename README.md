@@ -1,8 +1,5 @@
 # Accepted-Side Residual Validation for Uncertainty-Aware Distributed Trust Verification: Supplementary Material
 
-**IEEE Transactions on Dependable and Secure Computing (TDSC)**  
-**Authors**: Jaeyun Jeong and HwaYoung Jeong
-
 This repository contains the complete implementation and supplementary material for an uncertainty-aware multi-stage verification framework for distributed trust systems, evaluated on maritime Automatic Identification System (AIS) data.
 
 ## Overview
@@ -405,7 +402,6 @@ $$\theta_Q = Q_q(Q_b^+), \quad q = 0.01$$
 **Processed Results**:
 - `results/tables/paper_main/`: Main paper tables (CSV, JSON, TeX, Markdown)
 - `results/tables/paper_appendix/`: Appendix tables
-- `results/figures/ieee_tdsc_pack/`: Publication-ready figures
 
 **Raw Results**:
 - `results/tables/`: Raw experiment outputs (JSON metadata, CSV)
@@ -630,7 +626,6 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 - AIS data providers (Mendeley Data, port authorities)
 - Qiskit development team for quantum circuit framework
-- IEEE TDSC editorial board for feedback and guidance
 
 ---
 
